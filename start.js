@@ -1,20 +1,4 @@
-/*
-DEPARTMENT
-1	Engineering
-2	Legal
-3	Finance
-4	Sales
-===============================================
-ROLE
-ID  Title               Salary  Department_id
-1	Lead Engineer	    150000	1
-2	Sofware Engineer	120000	1
-3	Legal Team Lead	    250000	2
-4	Lawyer	            190000	2
-5	Salesperson	        80000	4
-6	Sales Lead	        100000	4
-=============================================
-*/
+
 const inquirer = require("inquirer");
 const dbConnection = require("./config/connection.js");
 dbConnection.connect(function (err) {
@@ -23,14 +7,6 @@ dbConnection.connect(function (err) {
     start();
 
 });
-
-
-/*Bonus:
-    > Update employee managers
-    > Remove employee
-    > Remove roles
-    > Remove departments
-    > View employees by manager */
 
 const start = () => {
     // prompt user to start app
@@ -59,7 +35,7 @@ const start = () => {
             addEmployee();
         }
         if (res.userOperation === "Update employee roles") {
-            updateEmployeRoles();
+            updateEmployeeRoles();
         }
         if (res.userOperation === "View all employees") {
             viewAllEmployees();
@@ -157,9 +133,7 @@ const addRoles = () => {
 }
 
 const addEmployee = () => {
-    // insert new employee
-
-    const managers = []; // For showing list of departments for users to select when adding new employee
+    const managers = ['No manager']; // For showing list of departments for users to select when adding new employee
     const roles = []; // For list of roles for users to select when adding new employee
     const getManagersAndRoles = () => {
         // make list of managers for users to select to be the manager of new employee
@@ -204,46 +178,119 @@ const addEmployee = () => {
                 choices: roles,
                 name: "role"
             }
-        ]).then(val => {
-            const firstName = val.manager.split(" ")[0];
-            const lastName = val.manager.split(" ")[1];
-            let managerId;
-            let roleId;
-
-            // get manager id
-            dbConnection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ? ", [firstName, lastName], (err, res) => {
-                if (err) throw err;
-                managerId = res[0].id;
+        ])
+            .then(val => {
                 // get role id
                 dbConnection.query("SELECT id FROM role WHERE title = ?", [val.role], (error, data) => {
+                    let roleId;
                     if (error) throw error;
                     roleId = data[0].id;
-
-                    // insert into table 'employee'
-                    dbConnection.query("INSERT INTO employee SET ?",
-                        {
-                            first_name: val.firstName,
-                            last_name:  val.lastName,
-                            role_id:    roleId,
-                            manager_id: managerId
-                        },
-                        (err, res) => {
+                    let managerId;
+                    let firstName;
+                    let lastName;
+                    if (val.manager === 'No manager') {
+                        firstName = null;
+                        lastName = null;
+                        managerId = null;
+                        // insert into table 'employee'
+                        dbConnection.query("INSERT INTO employee SET ?",
+                            {
+                                first_name: val.firstName,
+                                last_name: val.lastName,
+                                role_id: roleId,
+                                manager_id: managerId
+                            },
+                            (err, res) => {
+                                if (err) throw err;
+                                console.log("\n New employee is added successfully! \n");
+                                start();
+                            });
+                    } else {
+                        firstName = val.manager.split(" ")[0];
+                        lastName = val.manager.split(" ")[1];
+                        // get manager id
+                        dbConnection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ? ", [firstName, lastName], (err, res) => {
                             if (err) throw err;
-                            console.log("\n New employee is added successfully! \n");
-                            start();
-                        });
+                            managerId = res[0].id;
+                            // insert into table 'employee'
+                            dbConnection.query("INSERT INTO employee SET ?",
+                                {
+                                    first_name: val.firstName,
+                                    last_name: val.lastName,
+                                    role_id: roleId,
+                                    manager_id: managerId
+                                },
+                                (err, res) => {
+                                    if (err) throw err;
+                                    console.log("\n New employee is added successfully! \n");
+                                    start();
+                                });
+                        }); // end of get mangerId promise
+                    } // end of else
+
+                }); // end of get role ID promise
+            }); // enf of inquirer prompt
+    }
+}
+
+const updateEmployeeRoles = () => {
+
+    // make list of employees for users to select to update the role
+    const employees = []; // List of employees for users to select for updating role
+    const roles = []; // List of roles for users to select for updating employee's role
+
+    // Function to get employee list and role list
+    const getListEmployeesAndRoles = () => {
+        // get list of employees
+        dbConnection.query("SELECT CONCAT(first_name, ' ', last_name) AS name FROM employee", (err, res) => {
+            if (err) throw err;
+            for (emp of res) {
+                employees.push(emp.name);
+            }
+            // get list of roles
+            dbConnection.query("SELECT title FROM role", (err, res) => {
+                if (err) throw err;
+                for (role of res) {
+                    roles.push(role.title);
+                }
+                askToUpdateEmployeeRole();
+            });
+        });
+    }
+    getListEmployeesAndRoles(); // execute to get the array 'employees' and array 'roles' initialized
+
+    // Function to ask users for their input
+    const askToUpdateEmployeeRole = () => {
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select an employee to update her/his role:",
+                choices: employees,
+                name: "empName"
+            },
+            {
+                type: "list",
+                message: "Select new role of the employee:",
+                choices: roles,
+                name: "newRole"
+            }
+        ]).then(function (res) {
+            const firstName = res.empName.split(" ")[0];
+            const lastName = res.empName.split(" ")[1];
+            let newRoleId;
+            // get role ID
+            dbConnection.query("SELECT id FROM role WHERE title = ?", [res.newRole], function (err, data) {
+                if (err) throw err;
+                newRoleId = data[0].id;
+                // Update table 'employee' with new role
+                dbConnection.query("UPDATE employee SET ? WHERE ? AND ?", [{ role_id: newRoleId }, { first_name: firstName }, { last_name: lastName }], function (error, res) {
+                    if (error) throw error;
+                    console.log("\n New employee's role is updated successfully \n");
+                    start();
                 });
             });
         });
     }
-}
-
-const updateEmployeRoles = () => {
-    // make list of employees for users to select to update the role
-    // make list of roles for users to select to make change employee's role
-    // get employee ID
-    // get role ID
-    // update employee with new role
 }
 
 const viewAllDepartments = () => {
