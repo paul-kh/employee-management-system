@@ -29,7 +29,7 @@ So that I can organize and plan my business
 * mySQL     - To store data.
 * Inquirer  - To prompt users for their input.
 
-## Database Schema
+### Database Schema
 
 ![Alt text](./Assets/images/schema.png?raw=true "Database Schema Diagram")
 
