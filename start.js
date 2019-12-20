@@ -67,7 +67,7 @@ const addDepartment = () => {
             },
             (err, res) => {
                 if (err) throw err;
-                console.log("\n New department is successfully! \n");
+                console.log("\n New department is added successfully! \n");
                 start();
             });
     });

@@ -27,6 +27,7 @@ So that I can organize and plan my business
 
 * Node.js   - Back-end script for processing users' input and manipulate data in the database.
 * mySQL     - To store data.
+* MAMP      - Local Server Environment that handles web service and connection to database.
 * Inquirer  - To prompt users for their input.
 
 ### Database Schema
