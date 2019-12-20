@@ -1,5 +1,7 @@
 # Employee Tracker
-This application has the following functions:
+
+Developers are often tasked with creating interfaces that make it easy for non-developers to view and interact with information stored in databases. Often these interfaces are known as **C**ontent **M**anagement **S**ystems. The challenge is to architect and build a solution for managing a company's employees using node, inquirer, and MySQL.
+This application was built to overcome this challenge. It has the following functionalities:
 
   * Add departments, roles, employees
 
@@ -9,12 +11,6 @@ This application has the following functions:
 
   * Update employee managers
 
-  * View employees by manager
-
-  * Delete departments, roles, and employees
-
-  * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
 We can frame this challenge as follows:
 
 ```
@@ -23,7 +19,15 @@ I want to be able to view and manage the departments, roles, and employees in my
 So that I can organize and plan my business
 ```
 
+![Alt text](./Assets/images/employee-tracker.gif?raw=true "App Demo")
 
+# Technologies Used
+
+* Node.js   - Back-end script for processing users' input and manipulate data in the database.
+* mySQL     - To store data.
+* Inquirer  - To prompt users for their input.
+
+![Alt text](./Assets/images/schema.png?raw=true "Database Schema Diagram")
 
 
 
