@@ -19,13 +19,17 @@ I want to be able to view and manage the departments, roles, and employees in my
 So that I can organize and plan my business
 ```
 
+## App Demo
+
 ![Alt text](./Assets/images/employee-tracker.gif?raw=true "App Demo")
 
-# Technologies Used
+## Technologies Used
 
 * Node.js   - Back-end script for processing users' input and manipulate data in the database.
 * mySQL     - To store data.
 * Inquirer  - To prompt users for their input.
+
+## Database Schema
 
 ![Alt text](./Assets/images/schema.png?raw=true "Database Schema Diagram")
 
